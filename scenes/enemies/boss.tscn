@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/boss_enemy.gd" id="1_boss"]
+
+[node name="Boss" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_boss")
+enemy_id = "boss_stage1"
+max_hp = 300.0
+score_value = 50000
+power_drop = 0.0
+point_item_drops = 0
+move_speed = 60.0
+collision_radius = 70.0
+pattern_id = "ring_12"
+fire_interval = 0.8
+target_y = 100.0
+drop_chance = 1.0
+damage_cooldown = 0.20
+is_boss = true
+color_tint = Color(0.7, 0.2, 0.9, 1)
