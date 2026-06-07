@@ -7,6 +7,7 @@ var _sprite: Sprite2D = null
 
 func _ready() -> void:
 	_game = get_node_or_null("/root/Game")
+	queue_redraw()
 
 	# Player sprite (PNG loaded if imported, else procedural)
 	_sprite = Sprite2D.new()
@@ -71,6 +72,22 @@ func _create_beijing_1_texture() -> ImageTexture:
 				img.set_pixel(x, y, Color(0.2, 0.6, 1.0, glow))
 	return ImageTexture.create_from_image(img)
 
+
+func _process(_delta: float) -> void:
+	queue_redraw()
+
+func _draw() -> void:
+	if not _game:
+		return
+	var sl: int = _game.get("shield_layers")
+	for i in range(sl):
+		var r: float = 28.0 + i * 6.0
+		draw_circle(Vector2.ZERO, r, Color(0.3, 0.5, 1.0, 0.4), false, 2.0)
+	if _game.get("drone_active"):
+		var t: float = Time.get_ticks_msec() / 1000.0
+		var orbit: Vector2 = Vector2(cos(t * 3.0) * 35.0, sin(t * 3.0) * 35.0)
+		draw_circle(orbit, 5.0, Color(0.0, 0.9, 0.9, 0.8))
+		draw_circle(orbit, 7.0, Color(0.0, 0.9, 0.9, 0.3), false, 1.5)
 
 func _create_hitbox_texture() -> ImageTexture:
 	var size: int = 16

@@ -20,6 +20,10 @@ var graze_count: int = 0
 var power: float = 1.00
 var player_hp: float = 100.0
 var player_max_hp: float = 100.0
+var shield_layers: int = 0
+var drone_active: bool = false
+var drone_timer: float = 0.0
+const DRONE_INTERVAL: float = 1.5
 
 const POOL_SIZE: int = 500
 var _bullet_scene: PackedScene = null
@@ -46,17 +50,79 @@ var boss_entering: bool = false
 var warning_timer: float = 0.0
 var current_wave: int = 0
 var _wave_clear_timer: float = 0.0
-var _waves: Array[Array] = [
-	["grunt", "grunt", "grunt", "fairy"],
-	["grunt", "fairy", "fairy", "fairy"],
-	["grunt", "grunt", "fairy", "medium"],
-	["fairy", "fairy", "medium", "medium"],
-	["grunt", "medium", "medium", "elite"],
-	["fairy", "fairy", "medium", "elite", "elite"],
-]
+
+# Stage config: {stage_num: {waves: [...], boss_hp: ..., boss_name: ..., boss_fire: ...}}
+var _stage_data: Dictionary = {
+	1: {
+			"waves": [
+			["grunt", "grunt"],
+			["grunt", "grunt", "fairy"],
+			["grunt", "fairy", "fairy"],
+			["fairy", "fairy", "fairy"],
+			["fairy", "fairy", "medium"],
+			["medium", "medium", "fairy"],
+		],
+			"boss_hp": 200.0,
+			"boss_name": "巡逻舰",
+			"boss_fire": 1.0,
+	},
+	2: {
+			"waves": [
+			["grunt", "fairy", "fairy"],
+			["fairy", "fairy", "fairy"],
+			["fairy", "medium", "fairy"],
+			["medium", "medium", "fairy"],
+			["medium", "medium", "medium"],
+			["medium", "elite", "fairy"],
+		],
+			"boss_hp": 250.0,
+			"boss_name": "突击舰",
+			"boss_fire": 0.85,
+	},
+	3: {
+			"waves": [
+			["fairy", "fairy", "fairy", "grunt"],
+			["fairy", "medium", "fairy", "fairy"],
+			["medium", "medium", "fairy", "grunt"],
+			["medium", "medium", "elite", "fairy"],
+			["medium", "elite", "fairy", "medium"],
+			["elite", "medium", "medium", "elite"],
+		],
+			"boss_hp": 300.0,
+			"boss_name": "驱逐舰",
+			"boss_fire": 0.75,
+	},
+	4: {
+			"waves": [
+			["fairy", "medium", "fairy", "grunt"],
+			["medium", "fairy", "medium", "medium"],
+			["medium", "elite", "fairy", "medium"],
+			["elite", "medium", "elite", "fairy"],
+			["elite", "elite", "medium", "medium"],
+			["elite", "elite", "elite", "fairy"],
+		],
+			"boss_hp": 350.0,
+			"boss_name": "巡洋舰",
+			"boss_fire": 0.65,
+	},
+	5: {
+			"waves": [
+			["medium", "fairy", "medium", "grunt"],
+			["medium", "medium", "elite", "fairy"],
+			["elite", "medium", "elite", "medium"],
+			["elite", "elite", "medium", "medium"],
+			["elite", "elite", "elite", "fairy"],
+			["elite", "elite", "elite", "elite"],
+		],
+			"boss_hp": 400.0,
+			"boss_name": "海盗旗舰",
+			"boss_fire": 0.55,
+	},
+}
 
 
 func _ready() -> void:
+	current_stage = get_tree().root.get_meta("selected_stage", 1)
 	preload_resources()
 	spawn_player()
 	current_wave = 0
@@ -124,6 +190,8 @@ func _process(delta: float) -> void:
 		_update_player_state_timers(delta)
 	_update_all_bullets(delta)
 	_check_collisions()
+	if drone_active:
+		_update_drone(delta)
 
 
 func preload_resources() -> void:
@@ -150,12 +218,12 @@ func spawn_player() -> void:
 
 
 func _spawn_wave(wave_idx: int) -> void:
-	if wave_idx >= _waves.size():
+	if wave_idx >= _stage_data[current_stage]["waves"].size():
 		_show_warning_danger()
 		boss_entering = true
 		warning_timer = 0.0
 		return
-	var enemies: Array = _waves[wave_idx]
+	var enemies: Array = _stage_data[current_stage]["waves"][wave_idx]
 	for i in enemies.size():
 		var type: String = enemies[i]
 		var path: String = "res://scenes/enemies/" + type + ".tscn"
@@ -204,13 +272,15 @@ func spawn_boss() -> void:
 	if bs == null:
 		return
 	var boss: Node2D = bs.instantiate()
+	boss.set("fire_interval", _stage_data[current_stage]["boss_fire"])
+	boss.set("max_hp", _stage_data[current_stage]["boss_hp"])
 	boss.global_position = Vector2(240, -80)
 	enemy_layer.add_child(boss)
 	active_enemies.append(boss)
 	if boss.has_signal("destroyed"):
 		boss.destroyed.connect(_on_enemy_destroyed)
 	if boss_hud_ctrl and boss_hud_ctrl.has_method("show_boss"):
-		boss_hud_ctrl.show_boss("海盗旗舰", 300.0)
+		boss_hud_ctrl.show_boss(_stage_data[current_stage]["boss_name"], _stage_data[current_stage]["boss_hp"])
 
 
 func _update_player_movement(delta: float) -> void:
@@ -442,6 +512,12 @@ func _hit_player(bullet: Node2D = null) -> void:
 		despawn_bullet(bullet)
 	if invincible:
 		return
+	# Shield absorbs hit first
+	if shield_layers > 0:
+		shield_layers -= 1
+		invincible = true
+		invincible_timer = 0.5
+		return
 	var dmg: float = 10.0 if bullet else 20.0
 	player_hp -= dmg
 	invincible = true
@@ -519,6 +595,8 @@ func _stage_clear() -> void:
 func _restart_game() -> void:
 	$GameOverOverlay.visible = false
 	player_hp = player_max_hp
+	shield_layers = 0
+	drone_active = false
 	power = 1.0
 	score = 0
 	graze_count = 0
@@ -569,6 +647,33 @@ func get_bullet_layer() -> Node2D:
 
 func get_enemy_layer() -> Node2D:
 	return enemy_layer
+
+
+func _update_drone(delta: float) -> void:
+	# Draw drone as small orbiting sprite
+	if not is_instance_valid(player_node):
+		return
+	drone_timer -= delta
+	if drone_timer <= 0:
+		drone_timer = DRONE_INTERVAL
+		# Find nearest alive enemy
+		var nearest: Node2D = null
+		var nearest_dist: float = 9999.0
+		var pp: Vector2 = player_node.global_position
+		for enemy: Node2D in active_enemies:
+			if not is_instance_valid(enemy) or not enemy.is_alive:
+				continue
+			var d: float = pp.distance_to(enemy.global_position)
+			if d < nearest_dist:
+				nearest_dist = d
+				nearest = enemy
+			if nearest:
+				var dir: Vector2 = (nearest.global_position - pp).normalized()
+				for j in range(3):
+					var laser_off: Vector2 = Vector2(randf_range(-6, 6), randf_range(-6, 6))
+					spawn_bullet(9, pp + dir * 20.0 + laser_off, dir, 800.0, {
+						"bullet_color": Color.CYAN, "is_player_bullet": true, "damage": 3.0,
+						"collision_radius": 6.0, "lifetime": 0.8})
 
 
 func get_item_layer() -> Node2D:

@@ -76,4 +76,5 @@ func _update_selection() -> void:
 
 
 func _start_stage(stage: int) -> void:
+	get_tree().root.set_meta("selected_stage", stage)
 	get_tree().change_scene_to_file("res://scenes/game/game.tscn")

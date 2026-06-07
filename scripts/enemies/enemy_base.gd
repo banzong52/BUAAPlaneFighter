@@ -166,9 +166,16 @@ func destroy() -> void:
 		var il: Node2D = _game.get_item_layer()
 		if il:
 			for i in range(point_item_drops):
+				var itype: int = 1  # POINT
+				if enemy_id == "elite":
+					var rr: float = randf()
+					if rr < 0.08: itype = 4  # SHIELD
+					elif rr < 0.16: itype = 5  # DRONE
+					elif rr < 0.40: itype = 0  # POWER
 				var item_scene: PackedScene = load("res://scenes/items/point_item.tscn")
 				if item_scene:
 					var item: Node2D = item_scene.instantiate()
+					item.set("item_type", itype)
 					item.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-10, 10))
 					il.add_child(item)
 	destroyed.emit(self)
