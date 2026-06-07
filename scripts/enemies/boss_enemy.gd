@@ -4,6 +4,7 @@ extends "res://scripts/enemies/enemy_base.gd"
 var phase: int = 1
 var phase2_triggered: bool = false
 var entering: bool = true
+var boss_texture: String = ""
 var pattern_timer: float = 0.0
 var current_pattern: int = 0
 var phase1_patterns: Array[String] = ["ring_12", "aimed_triple", "spread_5", "fan_aimed"]
@@ -15,8 +16,16 @@ const SCREEN_BOTTOM: float = 280.0
 func _ready() -> void:
 	super._ready()
 	if _sprite:
-		_sprite.texture = _make_boss_texture()
-		_sprite.scale = Vector2(2.0, 2.0)
+		var path: String = "res://assets/textures/enemies/" + boss_texture + ".png"
+		if not boss_texture.is_empty() and FileAccess.file_exists(path):
+			var img: Image = Image.load_from_file(ProjectSettings.globalize_path(path))
+			if img:
+				_sprite.texture = ImageTexture.create_from_image(img)
+				_sprite.scale = Vector2(0.7, 0.7)
+				_sprite.rotation_degrees = 180
+		else:
+			_sprite.texture = _make_boss_texture()
+			_sprite.scale = Vector2(2.0, 2.0)
 
 func _process(delta: float) -> void:
 	if _damage_cd > 0:

@@ -44,7 +44,8 @@ var stage_time: float = 0.0
 var _cleanup_timer: float = 0.0
 var paused: bool = false
 var resume_countdown: float = 0.0
-var _x_was_down: bool = false
+var _x_was_down: bool = true
+var _bgm_node: Node = null
 var elite_count: int = 0
 var boss_entering: bool = false
 var warning_timer: float = 0.0
@@ -102,7 +103,7 @@ var _stage_data: Dictionary = {
 			["elite", "elite", "elite", "fairy"],
 		],
 			"boss_hp": 350.0,
-			"boss_name": "巡洋舰",
+			"boss_name": "巡空舰",
 			"boss_fire": 0.65,
 	},
 	5: {
@@ -131,20 +132,20 @@ func _ready() -> void:
 
 
 func _start_bgm() -> void:
-	var bgm: Node = load("res://scripts/systems/bgm_player.gd").new()
-	bgm.name = "BGM"
-	add_child(bgm)
-	if bgm.has_method("play_game"):
-		bgm.play_game()
+	_bgm_node = load("res://scripts/systems/bgm_player.gd").new()
+	_bgm_node.name = "BGM"
+	add_child(_bgm_node)
+	if _bgm_node.has_method("play_game"):
+		_bgm_node.play_game()
 
 
 func _process(delta: float) -> void:
 	if current_state == State.GAME_OVER:
-		if Input.is_action_just_pressed("shoot"):
+		if Input.is_action_just_pressed("bomb"):
 			get_tree().change_scene_to_file("res://scenes/menus/title_screen.tscn")
 		return
 	if current_state == State.STAGE_CLEAR:
-		if Input.is_action_just_pressed("shoot"):
+		if Input.is_action_just_pressed("bomb"):
 			get_tree().change_scene_to_file("res://scenes/menus/title_screen.tscn")
 		return
 	_check_pause()
@@ -268,12 +269,16 @@ func _show_warning_danger() -> void:
 
 func spawn_boss() -> void:
 	boss_spawned = true
+	if _bgm_node and _bgm_node.has_method("play_boss"):
+		_bgm_node.play_boss()
 	var bs: PackedScene = load("res://scenes/enemies/boss.tscn")
 	if bs == null:
 		return
 	var boss: Node2D = bs.instantiate()
 	boss.set("fire_interval", _stage_data[current_stage]["boss_fire"])
 	boss.set("max_hp", _stage_data[current_stage]["boss_hp"])
+	var tex_map: Dictionary = {1:"patrol", 2:"assault", 3:"destroyer", 4:"battlecruiser", 5:"flag"}
+	boss.set("boss_texture", tex_map.get(current_stage, "flag"))
 	boss.global_position = Vector2(240, -80)
 	enemy_layer.add_child(boss)
 	active_enemies.append(boss)
@@ -452,7 +457,7 @@ func _check_collisions() -> void:
 	if not is_instance_valid(player_node) or invincible:
 		return
 	var hp: Vector2 = player_node.global_position
-	var hr: float = 4.0
+	var hr: float = 3.0
 	var gr: float = 50.0
 	# Enemy bullets vs player
 	for b in _active_bullets:

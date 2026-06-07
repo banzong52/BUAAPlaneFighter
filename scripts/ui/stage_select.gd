@@ -11,6 +11,8 @@ var stages: Array[String] = [
 var selected_idx: int = 0
 var labels: Array[Label] = []
 var _confirm_ready: bool = false
+var _x_down: bool = true
+var _esc_down: bool = true
 
 
 func _ready() -> void:
@@ -39,7 +41,7 @@ func _ready() -> void:
 		labels.append(label)
 
 	var hint: Label = Label.new()
-	hint.text = "↑↓ 选择  Z 确认  X 返回"
+	hint.text = "↑↓ 选择  X 确定  ESC 返回"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
@@ -61,10 +63,16 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("move_down"):
 		selected_idx = wrapi(selected_idx + 1, 0, stages.size())
 		_update_selection()
-	if Input.is_action_just_pressed("bomb"):
+	if Input.is_key_pressed(KEY_X) and not _x_down:
+		_x_down = true
 		_start_stage(selected_idx + 1)
-	if Input.is_action_just_pressed("pause"):
+	elif not Input.is_key_pressed(KEY_X):
+		_x_down = false
+	if Input.is_key_pressed(KEY_ESCAPE) and not _esc_down:
+		_esc_down = true
 		get_tree().change_scene_to_file("res://scenes/menus/title_screen.tscn")
+	elif not Input.is_key_pressed(KEY_ESCAPE):
+		_esc_down = false
 
 
 func _update_selection() -> void:

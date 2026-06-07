@@ -5,6 +5,7 @@ var menu_items: Array[String] = ["关卡选择", "退出"]
 var selected_idx: int = 0
 var labels: Array[Label] = []
 var _confirm_ready: bool = false
+var _x_down: bool = true
 
 
 func _ready() -> void:
@@ -63,7 +64,7 @@ func _create_title() -> void:
 
 	# Control guide
 	var guide: Label = Label.new()
-	guide.text = "鼠标 - 移动    Z - 确认    X - 返回"
+	guide.text = "鼠标 - 移动    X - 确定    ESC - 退出"
 	guide.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	guide.add_theme_font_size_override("font_size", 12)
 	guide.add_theme_color_override("font_color", Color(0.45, 0.5, 0.6))
@@ -92,8 +93,11 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("move_down"):
 		selected_idx = wrapi(selected_idx + 1, 0, menu_items.size())
 		_update_selection()
-	if Input.is_action_just_pressed("bomb"):
+	if Input.is_key_pressed(KEY_X) and not _x_down:
+		_x_down = true
 		_on_select()
+	elif not Input.is_key_pressed(KEY_X):
+		_x_down = false
 
 
 func _update_selection() -> void:

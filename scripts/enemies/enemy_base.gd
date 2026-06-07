@@ -41,9 +41,26 @@ func _ready() -> void:
 	_sprite.name = "Sprite"
 	_sprite.centered = true
 	add_child(_sprite)
-	_sprite.texture = _make_placeholder()
+	_load_texture()
 	if hover_at_y < 0:
 		hover_at_y = randf_range(120.0, 350.0)
+
+
+func _load_texture() -> void:
+	var path: String = ""
+	match enemy_id:
+		"elite": path = "res://assets/textures/enemies/fatal.png"
+		"medium": path = "res://assets/textures/enemies/hard.png"
+		"fairy": path = "res://assets/textures/enemies/normal.png"
+		"grunt": path = "res://assets/textures/enemies/easy.png"
+	if not path.is_empty() and FileAccess.file_exists(path):
+		var img: Image = Image.load_from_file(ProjectSettings.globalize_path(path))
+		if img:
+			_sprite.texture = ImageTexture.create_from_image(img)
+			_sprite.scale = Vector2(0.45, 0.45)
+			_sprite.rotation_degrees = 180
+			return
+	_sprite.texture = _make_placeholder()
 
 
 func _process(delta: float) -> void:
