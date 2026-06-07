@@ -1,0 +1,64 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="2_hud"]
+[ext_resource type="Script" path="res://scripts/ui/boss_hud.gd" id="3_boss_hud"]
+
+[node name="Game" type="Node"]
+script = ExtResource("1_main")
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="SkyLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0, 0.1)
+motion_mirroring = Vector2(0, 720)
+
+[node name="SkySprite" type="ColorRect" parent="ParallaxBackground/SkyLayer"]
+size = Vector2(480, 720)
+color = Color(0.05, 0.05, 0.15, 1)
+
+[node name="BuildingLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0, 0.3)
+motion_mirroring = Vector2(0, 720)
+
+[node name="BuildingSprite" type="ColorRect" parent="ParallaxBackground/BuildingLayer"]
+size = Vector2(480, 720)
+color = Color(0.1, 0.1, 0.2, 0.5)
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="PlayerLayer" type="Node2D" parent="World"]
+
+[node name="BulletLayer" type="Node2D" parent="World"]
+
+[node name="EnemyLayer" type="Node2D" parent="World"]
+
+[node name="ItemLayer" type="Node2D" parent="World"]
+
+[node name="EffectsLayer" type="Node2D" parent="World"]
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 1
+
+[node name="HUD" type="Control" parent="UI"]
+layout_mode = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("2_hud")
+
+[node name="BossHUD" type="Control" parent="UI"]
+layout_mode = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+visible = false
+script = ExtResource("3_boss_hud")
+
+[node name="PauseOverlay" type="CanvasLayer" parent="."]
+layer = 2
+visible = false
+
+[node name="GameOverOverlay" type="CanvasLayer" parent="."]
+layer = 3
+visible = false

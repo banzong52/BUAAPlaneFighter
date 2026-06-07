@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_base.gd" id="1_enemy"]
+
+[node name="Fairy" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_enemy")
+enemy_id = "fairy"
+max_hp = 5.0
+score_value = 100
+power_drop = 0.10
+point_item_drops = 1
+move_speed = 120.0
+collision_radius = 14.0
+can_shoot = true
+pattern_id = "aimed_single"
+fire_interval = 2.5
+hover_at_y = 200.0
+drop_chance = 0.0
+color_tint = Color(0.3, 0.7, 1.0, 1)

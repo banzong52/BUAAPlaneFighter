@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_base.gd" id="1_item"]
+
+[node name="PowerItem" type="Area2D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_item")
+item_type = 0
+power_amount = 0.05

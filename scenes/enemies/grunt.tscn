@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_base.gd" id="1_enemy"]
+
+[node name="Grunt" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_enemy")
+enemy_id = "grunt"
+max_hp = 3.0
+score_value = 50
+power_drop = 0.08
+point_item_drops = 0
+move_speed = 200.0
+collision_radius = 18.0
+can_shoot = false
+contact_damage = 1.0
+hover_at_y = 0.0
+drop_chance = 0.0
+color_tint = Color(0.5, 0.5, 0.5, 1)

@@ -1,0 +1,16 @@
+# Godot
+.godot/
+*.import
+*.translation
+export_presets.cfg
+/android/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+godot-mcp/

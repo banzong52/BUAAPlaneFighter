@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_base.gd" id="1_enemy"]
+
+[node name="Elite" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_enemy")
+enemy_id = "elite"
+max_hp = 40.0
+score_value = 1000
+power_drop = 1.00
+point_item_drops = 1
+move_speed = 60.0
+collision_radius = 30.0
+can_shoot = true
+pattern_id = "fan_aimed"
+fire_interval = 0.8
+hover_at_y = 180.0
+drop_chance = 0.40
+color_tint = Color(0.8, 0.1, 0.6, 1)
