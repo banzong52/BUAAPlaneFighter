@@ -1,64 +1,65 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://cd7fu3xka07w8"]
 
-[ext_resource type="Script" path="res://scripts/game/main.gd" id="1_main"]
-[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="2_hud"]
-[ext_resource type="Script" path="res://scripts/ui/boss_hud.gd" id="3_boss_hud"]
+[ext_resource type="Script" uid="uid://4rr38t02pjv5" path="res://scripts/game/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://b2ssxq1h51b0u" path="res://scripts/ui/hud.gd" id="2_hud"]
+[ext_resource type="Script" uid="uid://bdoidsnshld5x" path="res://scripts/ui/boss_hud.gd" id="3_boss_hud"]
 
-[node name="Game" type="Node"]
+[node name="Game" type="Node" unique_id=1135298884]
 script = ExtResource("1_main")
 
-[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+[node name="ParallaxBackground" type="ParallaxBackground" parent="." unique_id=1512780106]
 
-[node name="SkyLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+[node name="SkyLayer" type="ParallaxLayer" parent="ParallaxBackground" unique_id=782221876]
 motion_scale = Vector2(0, 0.1)
 motion_mirroring = Vector2(0, 720)
 
-[node name="SkySprite" type="ColorRect" parent="ParallaxBackground/SkyLayer"]
-size = Vector2(480, 720)
+[node name="SkySprite" type="ColorRect" parent="ParallaxBackground/SkyLayer" unique_id=2099749080]
+offset_right = 480.0
+offset_bottom = 720.0
 color = Color(0.05, 0.05, 0.15, 1)
 
-[node name="BuildingLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+[node name="BuildingLayer" type="ParallaxLayer" parent="ParallaxBackground" unique_id=1841570002]
 motion_scale = Vector2(0, 0.3)
 motion_mirroring = Vector2(0, 720)
 
-[node name="BuildingSprite" type="ColorRect" parent="ParallaxBackground/BuildingLayer"]
-size = Vector2(480, 720)
+[node name="BuildingSprite" type="ColorRect" parent="ParallaxBackground/BuildingLayer" unique_id=622827255]
+offset_right = 480.0
+offset_bottom = 720.0
 color = Color(0.1, 0.1, 0.2, 0.5)
 
-[node name="World" type="Node2D" parent="."]
+[node name="World" type="Node2D" parent="." unique_id=965458768]
 
-[node name="PlayerLayer" type="Node2D" parent="World"]
+[node name="PlayerLayer" type="Node2D" parent="World" unique_id=258837652]
 
-[node name="BulletLayer" type="Node2D" parent="World"]
+[node name="BulletLayer" type="Node2D" parent="World" unique_id=1976286022]
 
-[node name="EnemyLayer" type="Node2D" parent="World"]
+[node name="EnemyLayer" type="Node2D" parent="World" unique_id=2103818773]
 
-[node name="ItemLayer" type="Node2D" parent="World"]
+[node name="ItemLayer" type="Node2D" parent="World" unique_id=492730337]
 
-[node name="EffectsLayer" type="Node2D" parent="World"]
+[node name="EffectsLayer" type="Node2D" parent="World" unique_id=110324633]
 
-[node name="UI" type="CanvasLayer" parent="."]
-layer = 1
+[node name="UI" type="CanvasLayer" parent="." unique_id=2081171887]
 
-[node name="HUD" type="Control" parent="UI"]
-layout_mode = 0
+[node name="HUD" type="Control" parent="UI" unique_id=2013215434]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("2_hud")
 
-[node name="BossHUD" type="Control" parent="UI"]
-layout_mode = 0
+[node name="BossHUD" type="Control" parent="UI" unique_id=282864614]
+visible = false
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-visible = false
 script = ExtResource("3_boss_hud")
 
-[node name="PauseOverlay" type="CanvasLayer" parent="."]
+[node name="PauseOverlay" type="CanvasLayer" parent="." unique_id=871777071]
 layer = 2
 visible = false
 
-[node name="GameOverOverlay" type="CanvasLayer" parent="."]
+[node name="GameOverOverlay" type="CanvasLayer" parent="." unique_id=664225547]
 layer = 3
 visible = false
